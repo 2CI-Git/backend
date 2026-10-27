@@ -95,7 +95,14 @@ as $$
     );
 $$;
 
+-- `revoke from public` alone is not enough here. Supabase's default privileges
+-- grant execute on new public-schema functions directly to `anon` and
+-- `authenticated`, and a direct grant is not removed by revoking from PUBLIC.
+-- `anon` must be revoked by name or the function stays callable, unauthenticated,
+-- at /rest/v1/rpc/is_admin.
+
 revoke execute on function public.is_admin() from public;
+revoke execute on function public.is_admin() from anon;
 grant execute on function public.is_admin() to authenticated;
 
 -- ---------------------------------------------------------------------------
